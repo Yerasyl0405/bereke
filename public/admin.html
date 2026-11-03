@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Береке — админ-панель</title>
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1a2233;--mute:#5b6577;--line:#ffe0a8;--green:#16a34a;--sun:#ffb81c;--red:#ff3355;--on:#fff;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding:16px}
+main{max-width:820px;margin:0 auto}
+h1{font-size:24px;margin:0 0 12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+button{font:500 14px system-ui;border-radius:10px;padding:8px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.pri{background:var(--green);color:var(--on);border-color:var(--green)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.badge{background:var(--sun);color:#2b1c00;border-radius:99px;padding:2px 10px;font-size:13px}
+.line{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+input{padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:15px system-ui;min-width:0;flex:1 1 130px}
+label{display:block;font-size:13px;color:var(--mute)}
+small{color:var(--mute)}
+button.pri{box-shadow:0 3px 0 #0e7a35}button[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}.card{border:2px solid var(--line)}
+label.btnl{font:500 14px system-ui;border-radius:10px;padding:8px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<h1>Береке: админ-панель</h1>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => Math.round(n).toLocaleString("ru-RU") + " ₸";
+const ST = {pending:"Ожидает оплаты", reported:"Клиент сообщил об оплате", paid:"Оплачен", delivering:"В доставке", done:"Выполнен", cancelled:"Отменён"};
+const NEXT = {pending:[["paid","Подтвердить оплату"],["cancelled","Отменить"]], reported:[["paid","Подтвердить оплату"],["cancelled","Отменить"]],
+  paid:[["delivering","Передать в доставку"],["cancelled","Отменить"]], delivering:[["done","Выполнен"]]};
+let tab = "orders", orders = [], products = [], settings = {};
+
+async function api(method, url, body) {
+  const r = await fetch(url, {method, headers: {"Content-Type": "application/json"}, body: body ? JSON.stringify(body) : undefined});
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || r.status); }
+  return r.json();
+}
+
+function shrink(file){ return new Promise((res, rej) => { const r = new FileReader(); r.onerror = () => rej(new Error("Не удалось прочитать файл"));
+  r.onload = () => { const im = new Image(); im.onerror = () => rej(new Error("Это не изображение"));
+    im.onload = () => { const k = Math.min(1, 900 / im.width), c = document.createElement("canvas"); c.width = im.width * k; c.height = im.height * k;
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", .85)); }; im.src = r.result; }; r.readAsDataURL(file); }); }
+async function load() {
+  [orders, products, settings] = await Promise.all([api("GET","/api/admin/orders"), api("GET","/api/admin/products"), api("GET","/api/admin/settings")]);
+  render();
+}
+function render() {
+  const fresh = orders.filter(o => o.status === "reported").length;
+  $("tabs").innerHTML = [["orders", `Заказы (${fresh})`], ["products","Товары"], ["settings","Настройки"]]
+    .map(([k,t]) => `<button aria-pressed="${k===tab}" data-tab="${k}">${t}</button>`).join("");
+  let h = "";
+  if (tab === "orders") h = orders.length ? orders.map(o => `<div class="card"><div class="row"><b>№${o.id} · ${esc(o.name)} · ${esc(o.phone)}</b><span class="badge">${ST[o.status]}</span></div>
+    <small>${new Date(o.created_at).toLocaleString("ru-RU")}</small>
+    <div>${esc(o.addr)}${o.time ? "<br>Время: " + esc(o.time) : ""}${o.note ? "<br>Комментарий: " + esc(o.note) : ""}</div>
+    ${o.items.map(i => `<div class="line"><span>${esc(i.n)} — ${esc(i.q)} кг</span><span>${fmt(i.q*i.p)}</span></div>`).join("")}
+    <div class="row"><b>Итого: ${fmt(o.total)}</b><span>${(NEXT[o.status]||[]).map(([s,l]) => `<button class="${s==="paid"?"pri":""}" data-oid="${o.id}" data-st="${s}">${l}</button>`).join(" ")}
+    ${["done","cancelled"].includes(o.status) ? `<button data-odel="${o.id}">Удалить</button>` : ""}</span></div></div>`).join("") : "<p>Заказов пока нет.</p>";
+  if (tab === "products") h = `<div class="card"><b>Новый товар</b><div class="row"><input id="nE" placeholder="Эмодзи 🍎"><input id="nN" placeholder="Название"><input id="nC" placeholder="Категория"><input id="nP" type="number" min="1" placeholder="Цена ₸ за кг"><button class="pri" data-padd>Добавить</button></div></div>`
+    + products.map(p => `<div class="line"><span>${p.image ? `<img src="${esc(p.image)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;vertical-align:middle">` : esc(p.emoji)} ${esc(p.name)} <small>${esc(p.category)}</small></span><span>
+    <input type="number" min="1" value="${p.price}" data-pid="${p.id}" style="width:100px;flex:none"> ₸
+    <label class="btnl">Фото<input type="file" accept="image/*" data-pimg="${p.id}" hidden></label> <button data-pact="${p.id}">${p.active ? "Скрыть" : "Показать"}</button><button data-pdel="${p.id}">Удалить</button></span></div>`).join("");
+  if (tab === "settings") h = `<div class="card">` + [["kaspiPhone","Номер Kaspi для переводов"],["kaspiLink","Ссылка Kaspi QR / Kaspi Pay (необязательно)"],["freeFrom","Бесплатная доставка от, ₸"],["deliveryFee","Стоимость доставки, ₸"],["minOrder","Минимальный заказ, ₸"]]
+    .map(([k,l]) => `<label for="s_${k}">${l}</label><input id="s_${k}" data-set="${k}" value="${esc(settings[k])}" style="width:100%;margin-bottom:10px">`).join("")
+    + `<button class="pri" data-sset>Сохранить</button></div>`;
+  $("view").innerHTML = h;
+}
+document.addEventListener("click", async e => {
+  const t = e.target.closest("button"); if (!t) return;
+  try {
+    if (t.dataset.tab) { tab = t.dataset.tab; return render(); }
+    if (t.dataset.st) await api("PATCH", "/api/admin/orders/" + t.dataset.oid, {status: t.dataset.st});
+    else if (t.dataset.odel) { if (!confirm("Удалить заказ?")) return; await api("DELETE", "/api/admin/orders/" + t.dataset.odel); }
+    else if (t.hasAttribute("data-padd")) {
+      await api("POST", "/api/admin/products", {emoji: $("nE").value, name: $("nN").value, category: $("nC").value, price: $("nP").value});
+    }
+    else if (t.dataset.pact) { const p = products.find(x => x.id == t.dataset.pact); await api("PATCH", "/api/admin/products/" + p.id, {active: !p.active}); }
+    else if (t.dataset.pdel) { if (!confirm("Удалить товар?")) return; await api("DELETE", "/api/admin/products/" + t.dataset.pdel); }
+    else if (t.hasAttribute("data-sset")) {
+      const v = {}; document.querySelectorAll("[data-set]").forEach(i => v[i.dataset.set] = i.value);
+      await api("PUT", "/api/admin/settings", v); alert("Сохранено");
+    } else return;
+    await load();
+  } catch (err) { alert("Ошибка: " + err.message); }
+});
+document.addEventListener("change", async e => {
+  if (e.target.dataset.pimg && e.target.files[0]) { try { await api("POST", "/api/admin/products/" + e.target.dataset.pimg + "/image", {data: await shrink(e.target.files[0])}); await load(); } catch (err) { alert("Ошибка: " + err.message); } return; }
+  if (!e.target.dataset.pid) return;
+  try { await api("PATCH", "/api/admin/products/" + e.target.dataset.pid, {price: +e.target.value}); await load(); }
+  catch (err) { alert("Ошибка: " + err.message); }
+});
+load();
+setInterval(() => { if (tab === "orders" && !document.activeElement.matches("input")) load().catch(() => {}); }, 15000);
+</script>
+</body>
+</html>
