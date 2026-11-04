@@ -1,0 +1,1197 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f8f8ef">
+<title>Береке — админ-панель</title>
+
+<style>
+:root {
+  --bg: #f7f8ef;
+  --card: #ffffff;
+  --ink: #202b24;
+  --mute: #788078;
+  --line: #e8eddf;
+  --green: #25833e;
+  --green-dark: #17632e;
+  --green-light: #eaf5e8;
+  --red: #e84d4d;
+  --red-light: #fff0ed;
+  --yellow: #fff0c5;
+  --shadow: 0 5px 25px rgba(39, 65, 37, .06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px 18px;
+  background:
+    radial-gradient(circle at 5% 0%, #eaf3d9 0, transparent 30%),
+    var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, sans-serif;
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* HEADER */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 17px;
+  background: var(--green-light);
+  font-size: 28px;
+}
+
+.brand h1 {
+  margin: 0;
+  color: #356c3b;
+  font-size: 29px;
+  font-weight: 850;
+  letter-spacing: -1px;
+}
+
+.brand p {
+  margin: 0;
+  color: var(--mute);
+  font-size: 13px;
+}
+
+.online {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border-radius: 30px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.online::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  background: #20a34a;
+  border-radius: 50%;
+}
+
+/* TABS */
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+button {
+  font: 600 14px system-ui, sans-serif;
+  border-radius: 12px;
+  padding: 11px 17px;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+  transition: .2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px #203c2015;
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+button[aria-pressed="true"] {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+  box-shadow: 0 4px 12px #25833e25;
+}
+
+button.pri {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+  box-shadow: 0 3px 0 var(--green-dark);
+}
+
+button.pri:hover {
+  background: var(--green-dark);
+}
+
+button.danger {
+  color: var(--red);
+  background: var(--red-light);
+  border-color: #ffdddd;
+}
+
+/* CARDS */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 21px;
+  margin-bottom: 17px;
+  box-shadow: var(--shadow);
+  animation: appear .25s ease;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.card-title h2 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: -.5px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.row b {
+  font-size: 15px;
+}
+
+small {
+  color: var(--mute);
+  font-size: 12px;
+}
+
+/* BADGES */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 30px;
+  padding: 6px 12px;
+  background: var(--yellow);
+  color: #805600;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge.reported {
+  background: #e1efff;
+  color: #205d9e;
+}
+
+.badge.paid {
+  background: #e2f4e5;
+  color: #17632e;
+}
+
+.badge.delivering {
+  background: #eee8ff;
+  color: #6344a0;
+}
+
+.badge.done {
+  background: #e2f4e5;
+  color: #17632e;
+}
+
+.badge.cancelled {
+  background: #ffe6e6;
+  color: #b52f2f;
+}
+
+/* INPUTS */
+
+input {
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid #e1e7dc;
+  background: #fcfdf9;
+  color: var(--ink);
+  font: 14px system-ui;
+  min-width: 0;
+  flex: 1 1 130px;
+  outline: none;
+  transition: .2s;
+}
+
+input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px #25833e18;
+  background: white;
+}
+
+input::placeholder {
+  color: #a1aaa0;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--mute);
+  margin-bottom: 5px;
+}
+
+label.btnl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 13px system-ui;
+  border-radius: 10px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  background: #f7faf4;
+  color: var(--ink);
+  cursor: pointer;
+  margin: 0;
+  transition: .2s;
+}
+
+label.btnl:hover {
+  background: var(--green-light);
+}
+
+/* ORDER DETAILS */
+
+.order-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.order-name {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.order-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 20px;
+  padding: 12px 0;
+  color: #535e55;
+  font-size: 13px;
+}
+
+.order-items {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.line:last-child {
+  border-bottom: none;
+}
+
+.order-total {
+  font-size: 20px !important;
+  color: var(--green-dark);
+  font-weight: 850;
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.order-actions button {
+  font-size: 13px;
+}
+
+/* PRODUCTS */
+
+.product-add {
+  display: grid;
+  grid-template-columns: 75px 1fr 1fr 130px auto;
+  gap: 9px;
+  align-items: center;
+}
+
+.product-add input {
+  width: 100%;
+}
+
+.product-image {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 12px;
+  vertical-align: middle;
+  margin-right: 9px;
+}
+
+.product-name {
+  font-weight: 700;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-status {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-dark);
+  background: var(--green-light);
+  padding: 4px 9px;
+  border-radius: 20px;
+}
+
+.product-status.hidden {
+  background: #fff0ed;
+  color: #bd4545;
+}
+
+/* SETTINGS */
+
+.setting-field {
+  margin-bottom: 15px;
+}
+
+.setting-field input {
+  width: 100%;
+  display: block;
+}
+
+.save-button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 14px;
+}
+
+/* NOTICE */
+
+.notice {
+  background: #eff5e7;
+  border: 1px solid #e0ebd6;
+  color: #496448;
+  border-radius: 12px;
+  padding: 12px 15px;
+  font-size: 13px;
+  margin-top: 16px;
+}
+
+/* EMPTY */
+
+.empty {
+  text-align: center;
+  padding: 40px 15px;
+  color: var(--mute);
+}
+
+.empty-icon {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+/* ANIMATION */
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  body {
+    padding: 16px 11px;
+  }
+
+  .header {
+    align-items: flex-start;
+  }
+
+  .brand h1 {
+    font-size: 24px;
+  }
+
+  .logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .tabs button {
+    padding: 11px 5px;
+    font-size: 12px;
+  }
+
+  .card {
+    padding: 15px;
+    border-radius: 16px;
+  }
+
+  .order-info {
+    grid-template-columns: 1fr;
+  }
+
+  .product-add {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-add input,
+  .product-add button {
+    width: 100%;
+  }
+
+  .product-add button {
+    grid-column: span 2;
+  }
+
+  .line {
+    align-items: flex-start;
+  }
+
+  .line > span:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .order-actions {
+    width: 100%;
+  }
+
+  .order-actions button {
+    flex: 1;
+  }
+
+  .order-total {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .online {
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+
+  .product-add {
+    grid-template-columns: 1fr;
+  }
+
+  .product-add button {
+    grid-column: auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo">🌿</div>
+    <div>
+      <h1>Береке</h1>
+      <p>Админ-панель магазина</p>
+    </div>
+  </div>
+
+  <div class="online">Онлайн</div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div id="view">
+  <div class="card empty">
+    <div class="empty-icon">🌿</div>
+    Загрузка панели...
+  </div>
+</div>
+
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c])
+);
+
+const fmt = n =>
+  Math.round(Number(n) || 0).toLocaleString("ru-RU") + " ₸";
+
+const ST = {
+  pending: "Ожидает оплаты",
+  reported: "Клиент сообщил об оплате",
+  paid: "Оплачен",
+  delivering: "В доставке",
+  done: "Выполнен",
+  cancelled: "Отменён"
+};
+
+const NEXT = {
+  pending: [
+    ["paid", "✓ Подтвердить оплату"],
+    ["cancelled", "✕ Отменить"]
+  ],
+  reported: [
+    ["paid", "✓ Подтвердить оплату"],
+    ["cancelled", "✕ Отменить"]
+  ],
+  paid: [
+    ["delivering", "🚚 Передать в доставку"],
+    ["cancelled", "✕ Отменить"]
+  ],
+  delivering: [
+    ["done", "✓ Выполнен"]
+  ]
+};
+
+let tab = "orders";
+let orders = [];
+let products = [];
+let settings = {};
+
+/* API */
+
+async function api(method, url, body) {
+  const r = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.error || r.status);
+  }
+
+  return r.json();
+}
+
+/* IMAGE RESIZE */
+
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+
+    r.onerror = () =>
+      rej(new Error("Не удалось прочитать файл"));
+
+    r.onload = () => {
+      const im = new Image();
+
+      im.onerror = () =>
+        rej(new Error("Это не изображение"));
+
+      im.onload = () => {
+        const k = Math.min(1, 900 / im.width);
+
+        const c = document.createElement("canvas");
+
+        c.width = im.width * k;
+        c.height = im.height * k;
+
+        c.getContext("2d").drawImage(
+          im, 0, 0, c.width, c.height
+        );
+
+        res(c.toDataURL("image/jpeg", .85));
+      };
+
+      im.src = r.result;
+    };
+
+    r.readAsDataURL(file);
+  });
+}
+
+/* LOAD DATA */
+
+async function load() {
+  const data = await Promise.all([
+    api("GET", "/api/admin/orders"),
+    api("GET", "/api/admin/products"),
+    api("GET", "/api/admin/settings")
+  ]);
+
+  orders = data[0];
+  products = data[1];
+  settings = data[2];
+
+  render();
+}
+
+/* STATUS CLASS */
+
+function statusClass(status) {
+  return status === "reported" ? "reported" :
+    status === "paid" ? "paid" :
+    status === "delivering" ? "delivering" :
+    status === "done" ? "done" :
+    status === "cancelled" ? "cancelled" : "";
+}
+
+/* RENDER */
+
+function render() {
+
+  const fresh = orders.filter(
+    o => o.status === "reported"
+  ).length;
+
+  $("tabs").innerHTML = [
+    ["orders", `📦 Заказы (${fresh})`],
+    ["products", "🛍 Товары"],
+    ["settings", "⚙ Настройки"]
+  ].map(([k, t]) => `
+    <button
+      aria-pressed="${k === tab}"
+      data-tab="${k}">
+      ${t}
+    </button>
+  `).join("");
+
+  let h = "";
+
+  /* ORDERS */
+
+  if (tab === "orders") {
+
+    h = `
+      <div class="card">
+        <div class="card-title">
+          <h2>📦 Заказы</h2>
+          <button data-refresh>↻ Обновить</button>
+        </div>
+
+        ${orders.length ? orders.map(o => `
+          <div class="card" style="margin-bottom:13px">
+
+            <div class="order-top">
+              <div>
+                <div class="order-name">
+                  №${esc(o.id)} · ${esc(o.name)}
+                </div>
+                <small>📞 ${esc(o.phone)}</small>
+              </div>
+
+              <span class="badge ${statusClass(o.status)}">
+                ${esc(ST[o.status] || o.status)}
+              </span>
+            </div>
+
+            <small>
+              📅 ${new Date(o.created_at).toLocaleString("ru-RU")}
+            </small>
+
+            <div class="order-info">
+              <div>📍 ${esc(o.addr)}</div>
+              <div>🕒 ${esc(o.time || "Время не указано")}</div>
+              <div>💬 ${esc(o.note || "Без комментария")}</div>
+            </div>
+
+            <div class="order-items">
+              ${o.items.map(i => `
+                <div class="line">
+                  <span>
+                    ${esc(i.n)} — ${esc(i.q)} кг
+                  </span>
+                  <b>${fmt(i.q * i.p)}</b>
+                </div>
+              `).join("")}
+            </div>
+
+            <div class="row" style="margin-top:14px">
+              <b class="order-total">
+                Итого: ${fmt(o.total)}
+              </b>
+
+              <div class="order-actions">
+                ${(NEXT[o.status] || []).map(([s, l]) => `
+                  <button
+                    class="${s === "paid" || s === "done" ? "pri" : s === "cancelled" ? "danger" : ""}"
+                    data-oid="${esc(o.id)}"
+                    data-st="${s}">
+                    ${l}
+                  </button>
+                `).join("")}
+
+                ${["done", "cancelled"].includes(o.status) ? `
+                  <button
+                    class="danger"
+                    data-odel="${esc(o.id)}">
+                    🗑 Удалить
+                  </button>
+                ` : ""}
+              </div>
+            </div>
+
+          </div>
+        `).join("") : `
+          <div class="empty">
+            <div class="empty-icon">📦</div>
+            <b>Заказов пока нет</b>
+            <p>Новые заказы появятся здесь.</p>
+          </div>
+        `}
+
+        <div class="notice">
+          ℹ️ Автоматическое обновление каждые 15 секунд
+        </div>
+      </div>
+    `;
+  }
+
+  /* PRODUCTS */
+
+  if (tab === "products") {
+
+    h = `
+      <div class="card">
+
+        <div class="card-title">
+          <h2>🛍 Товары</h2>
+        </div>
+
+        <b>Добавить новый товар</b>
+
+        <div class="product-add" style="margin-top:13px">
+
+          <input
+            id="nE"
+            placeholder="🍎 Эмодзи"
+            maxlength="8">
+
+          <input
+            id="nN"
+            placeholder="Название товара">
+
+          <input
+            id="nC"
+            placeholder="Категория">
+
+          <input
+            id="nP"
+            type="number"
+            min="1"
+            placeholder="Цена ₸/кг">
+
+          <button class="pri" data-padd>
+            + Добавить
+          </button>
+
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <h2>📋 Список товаров</h2>
+          <small>${products.length} товаров</small>
+        </div>
+
+        ${products.length ? products.map(p => `
+          <div class="line">
+
+            <div class="product-info">
+
+              ${p.image ? `
+                <img
+                  class="product-image"
+                  src="${esc(p.image)}"
+                  alt="">
+              ` : `
+                <span style="font-size:30px">
+                  ${esc(p.emoji)}
+                </span>
+              `}
+
+              <div>
+                <div class="product-name">
+                  ${esc(p.name)}
+                </div>
+
+                <small>${esc(p.category)}</small>
+              </div>
+
+              <span class="product-status ${p.active ? "" : "hidden"}">
+                ${p.active ? "Активен" : "Скрыт"}
+              </span>
+
+            </div>
+
+            <div class="product-info">
+
+              <input
+                type="number"
+                min="1"
+                value="${esc(p.price)}"
+                data-pid="${esc(p.id)}"
+                aria-label="Цена товара"
+                style="width:105px;flex:none">
+
+              <b>₸</b>
+
+              <label class="btnl">
+                📷 Фото
+                <input
+                  type="file"
+                  accept="image/*"
+                  data-pimg="${esc(p.id)}"
+                  hidden>
+              </label>
+
+              <button data-pact="${esc(p.id)}">
+                ${p.active ? "👁 Скрыть" : "👁 Показать"}
+              </button>
+
+              <button
+                class="danger"
+                data-pdel="${esc(p.id)}">
+                🗑 Удалить
+              </button>
+
+            </div>
+
+          </div>
+        `).join("") : `
+          <div class="empty">
+            <div class="empty-icon">🍎</div>
+            Товаров пока нет
+          </div>
+        `}
+
+      </div>
+    `;
+  }
+
+  /* SETTINGS */
+
+  if (tab === "settings") {
+
+    const fields = [
+      ["kaspiPhone", "📱 Номер Kaspi для переводов"],
+      ["kaspiLink", "🔗 Ссылка Kaspi QR / Kaspi Pay (необязательно)"],
+      ["freeFrom", "🚚 Бесплатная доставка от, ₸"],
+      ["deliveryFee", "💰 Стоимость доставки, ₸"],
+      ["minOrder", "🛒 Минимальный заказ, ₸"]
+    ];
+
+    h = `
+      <div class="card">
+
+        <div class="card-title">
+          <h2>⚙ Настройки магазина</h2>
+        </div>
+
+        ${fields.map(([k, l]) => `
+          <div class="setting-field">
+            <label for="s_${k}">
+              ${l}
+            </label>
+
+            <input
+              id="s_${k}"
+              data-set="${k}"
+              value="${esc(settings[k] ?? "")}"
+              style="width:100%">
+          </div>
+        `).join("")}
+
+        <button class="pri save-button" data-sset>
+          💾 Сохранить настройки
+        </button>
+
+      </div>
+    `;
+  }
+
+  $("view").innerHTML = h;
+}
+
+/* CLICK EVENTS */
+
+document.addEventListener("click", async e => {
+
+  const t = e.target.closest("button");
+
+  if (!t) return;
+
+  try {
+
+    if (t.dataset.tab) {
+      tab = t.dataset.tab;
+      return render();
+    }
+
+    if (t.hasAttribute("data-refresh")) {
+      await load();
+      return;
+    }
+
+    if (t.dataset.st) {
+
+      t.disabled = true;
+
+      await api(
+        "PATCH",
+        "/api/admin/orders/" + encodeURIComponent(t.dataset.oid),
+        { status: t.dataset.st }
+      );
+
+    }
+
+    else if (t.dataset.odel) {
+
+      if (!confirm("Удалить заказ?")) return;
+
+      await api(
+        "DELETE",
+        "/api/admin/orders/" + encodeURIComponent(t.dataset.odel)
+      );
+
+    }
+
+    else if (t.hasAttribute("data-padd")) {
+
+      const emoji = $("nE").value.trim();
+      const name = $("nN").value.trim();
+      const category = $("nC").value.trim();
+      const price = $("nP").value;
+
+      if (!name || !category || !price || Number(price) <= 0) {
+        alert("Заполните название, категорию и правильную цену");
+        return;
+      }
+
+      await api("POST", "/api/admin/products", {
+        emoji,
+        name,
+        category,
+        price
+      });
+
+    }
+
+    else if (t.dataset.pact) {
+
+      const p = products.find(
+        x => x.id == t.dataset.pact
+      );
+
+      if (!p) return;
+
+      await api(
+        "PATCH",
+        "/api/admin/products/" + encodeURIComponent(p.id),
+        { active: !p.active }
+      );
+
+    }
+
+    else if (t.dataset.pdel) {
+
+      if (!confirm("Удалить товар?")) return;
+
+      await api(
+        "DELETE",
+        "/api/admin/products/" + encodeURIComponent(t.dataset.pdel)
+      );
+
+    }
+
+    else if (t.hasAttribute("data-sset")) {
+
+      const v = {};
+
+      document.querySelectorAll("[data-set]").forEach(i => {
+        v[i.dataset.set] = i.value;
+      });
+
+      await api("PUT", "/api/admin/settings", v);
+
+      alert("Настройки успешно сохранены!");
+
+    }
+
+    else {
+      return;
+    }
+
+    await load();
+
+  } catch (err) {
+
+    alert("Ошибка: " + err.message);
+
+    if (t.isConnected) t.disabled = false;
+
+  }
+
+});
+
+/* CHANGE EVENTS */
+
+document.addEventListener("change", async e => {
+
+  /* PRODUCT IMAGE */
+
+  if (e.target.dataset.pimg && e.target.files[0]) {
+
+    try {
+
+      const data = await shrink(e.target.files[0]);
+
+      await api(
+        "POST",
+        "/api/admin/products/" +
+        encodeURIComponent(e.target.dataset.pimg) +
+        "/image",
+        { data }
+      );
+
+      await load();
+
+    } catch (err) {
+
+      alert("Ошибка загрузки фото: " + err.message);
+
+    }
+
+    return;
+  }
+
+  /* PRODUCT PRICE */
+
+  if (!e.target.dataset.pid) return;
+
+  const price = Number(e.target.value);
+
+  if (!Number.isFinite(price) || price <= 0) {
+    alert("Введите правильную цену");
+    return;
+  }
+
+  try {
+
+    await api(
+      "PATCH",
+      "/api/admin/products/" +
+      encodeURIComponent(e.target.dataset.pid),
+      { price }
+    );
+
+    await load();
+
+  } catch (err) {
+
+    alert("Ошибка изменения цены: " + err.message);
+
+  }
+
+});
+
+/* INITIALIZATION */
+
+load().catch(err => {
+
+  $("view").innerHTML = `
+    <div class="card empty">
+      <div class="empty-icon">⚠️</div>
+      <b>Не удалось загрузить данные</b>
+      <p>${esc(err.message)}</p>
+      <button class="pri" onclick="location.reload()">
+        Повторить
+      </button>
+    </div>
+  `;
+
+});
+
+/* AUTO REFRESH */
+
+setInterval(() => {
+
+  if (
+    tab === "orders" &&
+    !document.activeElement.matches("input")
+  ) {
+    load().catch(() => {});
+  }
+
+}, 15000);
+
+</script>
+
+</body>
+</html>
+```
